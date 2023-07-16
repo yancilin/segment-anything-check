@@ -94,7 +94,7 @@ def main():
         mask_input = mask_input[None, ...]
         masks, scores, logits = predictor.predict(
             mask_input=mask_input,
-            multimask_output=True,
+            multimask_output=False,
         )
         for i, (mask, score) in enumerate(zip(masks, scores)):
             plt.figure(figsize=(10, 10))
