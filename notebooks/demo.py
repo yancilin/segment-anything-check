@@ -88,15 +88,21 @@ def main():
 
     image, idx2mask = read_data(jepg_path='data/mask_test/1-1.jpg', anno_path='data/mask_test/1-1.json')
     predictor.set_image(image)
-    for idx, mask in idx2mask.items():
+    for idx, mask_input in idx2mask.items():
         # resize mask -> (256, 256)
-        mask = cv2.resize(mask, (256, 256), interpolation=cv2.INTER_NEAREST)
-        mask = mask.unsqueeze(0)
+        mask_input = cv2.resize(mask_input, (256, 256), interpolation=cv2.INTER_NEAREST)
+        mask_input = mask_input[None, ...]
         masks, scores, logits = predictor.predict(
-            point_coords=input_point,
-            point_labels=input_label,
+            mask_input=mask_input,
             multimask_output=True,
         )
+        for i, (mask, score) in enumerate(zip(masks, scores)):
+            plt.figure(figsize=(10, 10))
+            plt.imshow(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+            show_mask(mask, plt.gca())
+            plt.title(f"Instance: {idx + 1}, Mask {i + 1}, Score: {score:.3f}", fontsize=18)
+            plt.axis('off')
+            plt.show()
 
 
 if __name__ == '__main__':
